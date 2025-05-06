@@ -1,13 +1,13 @@
-import styles from './Header.module.css'
+import styles from './Header.module.css';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Typography from '@mui/material/Typography';
 import { styled, useTheme } from '@mui/material/styles';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import React, { useContext } from 'react';
-import { UserContext } from '../../../Context/UserContext'
+import { UserContext } from '../../../Context/UserContext';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
@@ -37,8 +37,8 @@ const Header = ({ open, handleDrawerOpen, headerTitle }) => {
   const { isLoggedIn, currentUser, signOutUser } = useContext(UserContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const redirectToHome = () => {
-    navigate("/");
-  }
+    navigate('/');
+  };
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -52,9 +52,12 @@ const Header = ({ open, handleDrawerOpen, headerTitle }) => {
     handleClose(null);
   };
 
-
   return (
-    <AppBar position="fixed" open={open} style={{ backgroundColor: '#fff', color: "#31b372", boxShadow: "None" }} >
+    <AppBar
+      position="fixed"
+      open={open}
+      style={{ backgroundColor: '#fff', color: '#31b372', boxShadow: 'None' }}
+    >
       <Toolbar>
         <IconButton
           color="inherit"
@@ -65,13 +68,18 @@ const Header = ({ open, handleDrawerOpen, headerTitle }) => {
             marginRight: 5,
             ...(open && { display: 'none' }),
           }}
-
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h4" noWrap component="div" onClick={redirectToHome} sx={{ flexGrow: 1, fontWeight: 'bolder' }} >
+        <Typography
+          variant="h4"
+          noWrap
+          component="div"
+          onClick={redirectToHome}
+          sx={{ flexGrow: 1, fontWeight: 'bolder' }}
+        >
           {/* {headerTitle} */}
-          Green Hills Hospital
+          MediGO Hospital
         </Typography>
         {isLoggedIn && (
           <div className={styles.accountIcon}>
@@ -82,15 +90,24 @@ const Header = ({ open, handleDrawerOpen, headerTitle }) => {
               aria-haspopup="true"
               onClick={handleMenu}
               color="inherit"
-              
             >
               <AccountCircle style={{ fontSize: 42, marginRight: 8 }} />
-              <div style={{ display: 'flex', flexDirection: "column", alignItems: "start" }} >
-                <span style={{ fontSize: 19, color: 'grey', marginTop: 3 }} > {currentUser.firstName} {currentUser.lastName}</span>
-                <span style={{ fontSize: 12, color: 'grey' }} > {currentUser.userType}</span>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'start',
+                }}
+              >
+                <span style={{ fontSize: 19, color: 'grey', marginTop: 3 }}>
+                  {' '}
+                  {currentUser.firstName} {currentUser.lastName}
+                </span>
+                <span style={{ fontSize: 12, color: 'grey' }}>
+                  {' '}
+                  {currentUser.userType}
+                </span>
               </div>
-
-
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -114,7 +131,7 @@ const Header = ({ open, handleDrawerOpen, headerTitle }) => {
         )}
       </Toolbar>
     </AppBar>
-  )
-}
+  );
+};
 
 export default Header;

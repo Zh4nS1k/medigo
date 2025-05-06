@@ -1,71 +1,89 @@
-const express = require("express");
+require('dotenv').config(); // Must be at the VERY TOP
+
+const express = require('express');
 const app = express();
-const cors = require('cors')
+const cors = require('cors');
 const bodyParser = require('body-parser');
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-require("dotenv").config();
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
-const getAllPatients = require("./routes/api/getAllPatients");
-const getPatientByID = require("./routes/api/getPatientByID");
-const createPatient = require("./routes/api/createPatient");
-const editPatientByID = require("./routes/api/editPatientByID");
-const deletePatientByID = require("./routes/api/deletePatientByID");
-const LoginRegisterRoute = require("./routes/LoginRegisterRoute.js");
-const UserRoute = require("./routes/UserRoute.js");
-const DashboardRoute = require("./routes/DashboardRoute.js");
-const PatientRoute = require("./routes/PatientRoute.js");
-const DoctorRoute = require("./routes/DoctorRoute.js");
-const AppointmentRoute = require("./routes/AppointmentRoute.js");
-const MedicineRoute = require("./routes/MedicineRoute.js");
-const PrescriptionRoute = require("./routes/PrescriptionRoute.js");
-const InvoiceRoute = require("./routes/InvoiceRoute.js");
-const ProfileRoute = require("./routes/ProfileRoute.js");
+// ======================
+// Environment Variables Check
+// ======================
+const PORT = process.env.PORT || 5000; // Fallback to 5000 if not set
+const MONGODB_URI = process.env.MONGOCONNECTION || process.env.MONGODB_URI; // Support both names
 
+if (!MONGODB_URI) {
+  console.error(
+    '❌ FATAL ERROR: MongoDB connection URI not found in .env file'
+  );
+  console.log(
+    'Please add either MONGOCONNECTION or MONGODB_URI to your .env file'
+  );
+  process.exit(1); // Exit if no MongoDB URI
+}
 
+// ======================
+// Database Connection
+// ======================
+mongoose.set('strictQuery', true); // Prepare for Mongoose 7
+
+mongoose
+  .connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err.message);
+    process.exit(1); // Exit on DB connection failure
+  });
+
+// ======================
+// Middleware
+// ======================
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.set('strictQuery', true);
-mongoose.connect(process.env.MONGOCONNECTION, { useNewUrlParser: true });
+// ======================
+// Routes
+// ======================
+const routes = [
+  require('./routes/LoginRegisterRoute'),
+  require('./routes/DashboardRoute'),
+  require('./routes/UserRoute'),
+  require('./routes/PatientRoute'),
+  require('./routes/DoctorRoute'),
+  require('./routes/AppointmentRoute'),
+  require('./routes/MedicineRoute'),
+  require('./routes/PrescriptionRoute'),
+  require('./routes/InvoiceRoute'),
+  require('./routes/ProfileRoute'),
+  require('./routes/api/paypal'),
+];
 
+routes.forEach((route) => app.use(route));
 
-app.listen(process.env.PORT, () => {
-    console.log("App listening on port " + process.env.PORT);
-})
-
-app.use(LoginRegisterRoute);
-app.use(DashboardRoute);
-app.use(UserRoute);
-app.use(PatientRoute);
-app.use(DoctorRoute);
-app.use(AppointmentRoute);
-app.use(MedicineRoute);
-app.use(PrescriptionRoute);
-app.use(InvoiceRoute);
-app.use(ProfileRoute);
-
-
-
-// // API that get all patients
-// app.get('/patients', getAllPatients);
-
-// //API that gets a patient by ID
-// app.get('/patients/:id', getPatientByID);
-
-// //API for adding a patient
-// app.post('/patients', createPatient);
-
-// //API for editting a details of the patient by ID 
-// app.put('/patients/:id', editPatientByID);
-
-// //API for deleting a  patient by ID
-// app.delete('/patients/:id', deletePatientByID);
-app.use('/api/paypal', require('./routes/api/paypal'));
-
-
-app.get("/", (req, res) => {
-    res.send("hello world");
+// ======================
+// Basic Routes
+// ======================
+app.get('/', (req, res) => {
+  res.send('🏥 Hospital Management System API');
 });
 
+// ======================
+// Error Handling Middleware
+// ======================
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// ======================
+// Server Start
+// ======================
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🔗 MongoDB URI: ${MONGODB_URI}`);
+});
